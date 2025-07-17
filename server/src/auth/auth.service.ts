@@ -10,6 +10,7 @@ import { UserService } from '../user/user.service';
 import { verify } from 'argon2';
 import { Response } from 'express';
 import { Role } from '@prisma/client';
+import { EmailService } from '../email/email.service';
 
 @Injectable()
 export class AuthService {
@@ -19,6 +20,7 @@ export class AuthService {
   constructor(
     private prisma: PrismaService,
     private userService: UserService,
+    private emailService: EmailService,
     private jwt: JwtService,
   ) {}
 
@@ -38,7 +40,7 @@ export class AuthService {
     const { password, ...user } = await this.userService.create(dto);
     const tokens = await this.issueTokens(user.id, user.role);
 
-    // await this.emailService.sendWelcome(user.email);
+    await this.emailService.sendWelcome(user.email);
 
     return { user, ...tokens };
   }
